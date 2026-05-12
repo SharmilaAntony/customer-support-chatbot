@@ -1,0 +1,307 @@
+
+
+<h2 style="font-family:Arial,sans-serif;font-size:20px;font-weight:700;color:#232F3E;margin-bottom:10px;">Customer Support Chatbot</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{display:flex;flex-direction:column;height:600px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.hdr{padding:14px 18px;background:#185FA5;display:flex;align-items:center;gap:12px}
+.hdr-av{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hdr-info{flex:1}
+.hdr-name{font-size:15px;font-weight:500;color:#fff}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;margin-top:2px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.tabs{display:flex;overflow-x:auto;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:9px 15px;font-size:12px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;color:var(--color-text-secondary);transition:all 0.15s;flex-shrink:0}
+.tab.active{border-bottom-color:#185FA5;color:#185FA5;font-weight:500;background:var(--color-background-primary)}
+.tab:hover{color:var(--color-text-primary)}
+.chat-area{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:var(--color-border-secondary);border-radius:4px}
+.msg{display:flex;gap:8px;max-width:85%}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.bbl{padding:10px 14px;font-size:13px;line-height:1.6;border-radius:18px}
+.msg.bot .bbl{background:var(--color-background-secondary);color:var(--color-text-primary);border-radius:4px 18px 18px 18px}
+.msg.user .bbl{background:#185FA5;color:#fff;border-radius:18px 4px 18px 18px}
+.mav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;margin-top:2px}
+.bav{background:#185FA5;color:#fff}
+.uav{background:var(--color-background-tertiary);color:var(--color-text-secondary)}
+.time{font-size:10px;color:var(--color-text-tertiary);margin-top:3px;padding:0 2px}
+.typing-wrap{display:flex;gap:8px;max-width:85%}
+.typing-bbl{padding:12px 16px;background:var(--color-background-secondary);border-radius:4px 18px 18px 18px;display:flex;gap:4px;align-items:center}
+.typing-bbl span{width:7px;height:7px;border-radius:50%;background:var(--color-text-tertiary);animation:bounce 1.2s infinite}
+.typing-bbl span:nth-child(2){animation-delay:.2s}
+.typing-bbl span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chips-wrap{padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;border-top:0.5px solid var(--color-border-tertiary)}
+.chip{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s}
+.chip:hover{background:#E6F1FB;color:#185FA5;border-color:#185FA5}
+.inp-row{display:flex;gap:8px;padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.inp-row input{flex:1;font-size:13px;padding:8px 12px;border-radius:20px}
+.sbtn{padding:8px 18px;border-radius:20px;background:#185FA5;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.15s}
+.sbtn:hover{opacity:.85}
+.sec-panel{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.sec-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 16px;cursor:pointer;transition:all 0.15s;background:var(--color-background-primary);display:flex;align-items:center;gap:12px}
+.sec-card:hover{border-color:#185FA5;background:#E6F1FB}
+.sec-icon{width:36px;height:36px;border-radius:10px;background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sec-q{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sec-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.arr{margin-left:auto;color:var(--color-text-tertiary);font-size:16px}
+</style>
+
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-av">&#129302;</div>
+    <div class="hdr-info">
+      <div class="hdr-name">Support Assistant</div>
+      <div class="hdr-sub"><span class="live-dot"></span>Online - We typically reply instantly</div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabBar">
+    <div class="tab active" onclick="switchTab('chat',this)">&#128172; Chat</div>
+    <div class="tab" onclick="switchTab('orders',this)">&#128230; Orders</div>
+    <div class="tab" onclick="switchTab('refunds',this)">&#128176; Refunds</div>
+    <div class="tab" onclick="switchTab('shipping',this)">&#128666; Shipping</div>
+    <div class="tab" onclick="switchTab('account',this)">&#128100; Account</div>
+    <div class="tab" onclick="switchTab('payment',this)">&#128179; Payment</div>
+    <div class="tab" onclick="switchTab('product',this)">&#128717; Products</div>
+    <div class="tab" onclick="switchTab('offers',this)">&#127991; Offers</div>
+    <div class="tab" onclick="switchTab('tech',this)">&#9881; Tech Help</div>
+    <div class="tab" onclick="switchTab('contact',this)">&#128222; Contact</div>
+  </div>
+
+  <div id="chatView" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="chat-area" id="chatBody">
+      <div class="msg bot">
+        <div class="mav bav">&#129302;</div>
+        <div>
+          <div class="bbl">Hello! How can I help you today?</div>
+          <div class="time">Just now</div>
+        </div>
+      </div>
+    </div>
+    <div class="chips-wrap" id="chips">
+      <span class="chip" onclick="sendChip(this)">Track my order</span>
+      <span class="chip" onclick="sendChip(this)">Request a refund</span>
+      <span class="chip" onclick="sendChip(this)">Reset password</span>
+      <span class="chip" onclick="sendChip(this)">Payment failed</span>
+      <span class="chip" onclick="sendChip(this)">Cancel my order</span>
+      <span class="chip" onclick="sendChip(this)">Talk to an agent</span>
+    </div>
+    <div class="inp-row">
+      <input type="text" id="userInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <button class="sbtn" onclick="sendMsg()">Send</button>
+    </div>
+  </div>
+
+  <div id="sectionView" style="display:none;flex:1;overflow:hidden;flex-direction:column"></div>
+</div>
+
+<script>
+const sections={
+  orders:{icon:"&#128230;",items:[
+    {q:"Track my order",a:"You can track your order by going to My Orders in your account and entering your Order ID. You will receive live status updates and SMS notifications at every stage of delivery."},
+    {q:"Cancel my order",a:"Orders can be cancelled within 2 hours of placing them. Go to My Orders, select your order, and tap Cancel. After 2 hours, the order is prepared for dispatch and cannot be cancelled — you may return it after delivery."},
+    {q:"Change delivery address",a:"You can update your delivery address within 1 hour of placing the order via My Orders > Edit Address. After that, the order is locked for dispatch and address changes are not possible."},
+    {q:"Order not received",a:"If your order shows as Delivered but you have not received it, please wait up to 24 hours as couriers sometimes mark early. If still missing, go to My Orders > Report Issue and our team will investigate within 48 hours."},
+    {q:"Wrong item received",a:"We sincerely apologize for this. Please go to My Orders > Report Issue > Wrong Item and upload a photo. We will arrange a free pickup and send the correct item within 3 business days."},
+  ]},
+  refunds:{icon:"&#128176;",items:[
+    {q:"How do I request a refund?",a:"Go to My Orders, select the item, and tap Request Return. Our return window is 30 days from delivery. Once the item is picked up, your refund will be processed within 5-7 business days to your original payment method."},
+    {q:"My refund has not arrived",a:"If your refund is not showing after 7 business days, please check your bank statement for a pending credit. UPI refunds take 1-3 days, card refunds take 5-7 days. Share your order ID if you need us to escalate."},
+    {q:"I received a partial refund",a:"Partial refunds happen when only some items are returned, or if a discount was applied at the time of purchase. Go to My Orders > Refund Details to see a full breakdown of your refund amount."},
+    {q:"Can I get a refund to my wallet?",a:"Yes, you can choose to receive your refund as wallet credit during the return process. Wallet refunds are instant and can be used on your next purchase."},
+  ]},
+  shipping:{icon:"&#128666;",items:[
+    {q:"What are the shipping charges?",a:"Standard shipping is free on orders above Rs.500. Below that, a fee of Rs.50 applies. Express delivery (1-2 days) costs Rs.150. Same-day delivery is Rs.250 and is available in select cities only."},
+    {q:"When will my order arrive?",a:"Standard delivery takes 3-5 business days. Express delivery takes 1-2 business days. Same-day delivery is available if you order before 12 PM. You will receive a tracking link once your order is dispatched."},
+    {q:"Do you ship internationally?",a:"Yes, we ship to UAE, USA, UK, Canada, Singapore, and Australia. International orders take 7-14 business days. Customs duties are the responsibility of the customer. Free shipping on international orders above Rs.3000."},
+    {q:"Which courier partners do you use?",a:"We use BlueDart, Delhivery, and Ekart for domestic deliveries, and DHL or FedEx for international orders. A tracking ID is shared via SMS and email once your order ships."},
+  ]},
+  account:{icon:"&#128100;",items:[
+    {q:"How do I reset my password?",a:"On the login page, click Forgot Password and enter your registered email address. A reset link will be sent within 2 minutes. Please check your spam folder if you do not see it. The link is valid for 30 minutes."},
+    {q:"How do I update my mobile number?",a:"Go to My Account > Profile > Edit Mobile Number, enter your new number, and verify with OTP. Please note that you cannot use a number already linked to another account."},
+    {q:"How do I delete my account?",a:"Go to My Account > Settings > Delete Account. Please note that all your order history, saved addresses, and wallet balance will be permanently deleted and cannot be recovered."},
+    {q:"How do I enable two-factor authentication?",a:"Go to My Account > Security > Two-Factor Authentication and follow the setup steps. You can use an authenticator app or SMS OTP. We strongly recommend enabling this to keep your account secure."},
+  ]},
+  payment:{icon:"&#128179;",items:[
+    {q:"Payment failed but amount was deducted",a:"Please do not worry. If a payment failed but the amount was debited, it will automatically be reversed to your account within 5-7 business days. If not reversed after 7 days, please share your transaction ID and we will look into it."},
+    {q:"What payment methods do you accept?",a:"We accept all major credit and debit cards, UPI (GPay, PhonePe, Paytm), net banking (50+ banks), EMI options, and our in-app wallet. Cash on delivery is available on orders below Rs.2000."},
+    {q:"How do I apply a promo code?",a:"Enter your promo code in the Discount Code field at the checkout page before completing payment. Only one promo code can be used per order. Make sure the code has not expired and the minimum order value is met."},
+    {q:"Can I pay in instalments?",a:"Yes. EMI is available on orders above Rs.1000 using credit cards from HDFC, ICICI, SBI, Axis, and Kotak. You can choose 3, 6, or 12-month plans at checkout."},
+    {q:"How do I download my invoice?",a:"Go to My Orders, select the order, and tap Download Invoice. Your invoice is also emailed to you after order confirmation. GST invoices are available for business accounts."},
+  ]},
+  product:{icon:"&#128717;",items:[
+    {q:"I received a damaged product",a:"We are sorry about this. Please report it within 48 hours of delivery via My Orders > Report Issue > Damaged Item. Upload clear photos of the damage and we will arrange a free pickup with a replacement or full refund."},
+    {q:"What is the warranty on products?",a:"Most electronics carry a 1-year manufacturer warranty. Your invoice serves as the warranty card. Extended warranty plans are available at checkout for select products."},
+    {q:"Is the product genuine?",a:"All products on our platform are 100% genuine and sourced directly from authorised brand distributors. Every product carries the original brand seal. If you suspect otherwise, please report it immediately."},
+    {q:"I want to exchange for a different size",a:"You can exchange for a different size within 15 days of delivery. Go to My Orders > Request Exchange > Select New Size. The first exchange per order is free of charge."},
+  ]},
+  offers:{icon:"&#127991;",items:[
+    {q:"What offers are currently active?",a:"Current offers: SAVE10 for 10% off on orders above Rs.300, FIRSTBUY for 15% off your first order, WEEKEND20 for 20% off on weekends, and REFER50 for Rs.50 cashback when you refer a friend."},
+    {q:"How does the loyalty rewards program work?",a:"You earn 1 reward point for every Rs.10 spent. Every 100 points equals Rs.10 off your next order. Points expire after 12 months. Check your points under My Account > Rewards."},
+    {q:"How does the referral program work?",a:"Find your referral code under My Account > Refer and Earn. When a friend places their first order using your code, both of you receive Rs.50 cashback. There is no limit to how many friends you can refer."},
+    {q:"Are there bank-specific offers?",a:"Yes. HDFC cards get 10% off on Fridays, ICICI cards get 5% cashback, SBI cards get 8% off on EMI, and Kotak cards get a flat Rs.100 off on orders above Rs.1000. These can be combined with other offers."},
+  ]},
+  tech:{icon:"&#9881;",items:[
+    {q:"The app is crashing or not loading",a:"Please try these steps: force close and reopen the app, clear the app cache from your phone settings, check your internet connection, and update to the latest version. If the issue persists, uninstall and reinstall the app."},
+    {q:"The website is not working",a:"Try clearing your browser cache (Ctrl+Shift+Delete), using a different browser, or disabling browser extensions. You can also check our status page at status.company.com for any ongoing issues."},
+    {q:"I am not receiving the OTP",a:"Check that your mobile number is correct and that you have network signal. Also check if DND is enabled on your phone. Wait 60 seconds and request the OTP again. You can also use email OTP as a backup."},
+    {q:"I am not receiving notifications",a:"Enable notifications for our app under your phone Settings > Apps > Notifications. Make sure battery saver mode is not blocking background activity. Try logging out and back in if the issue continues."},
+  ]},
+  contact:{icon:"&#128222;",items:[
+    {q:"How can I call support?",a:"You can reach our customer care team at 1800-XXX-XXXX (toll-free). We are available Monday to Saturday, 9AM to 6PM IST. Average wait time is under 3 minutes."},
+    {q:"How can I email support?",a:"Send your query to support@company.com. We respond within 4 hours during business hours and within 12 hours on weekends. For urgent matters, please use live chat or phone support."},
+    {q:"How do I chat with a human agent?",a:"Live chat with a human agent is available on our website and app from 9AM to 10PM IST, seven days a week. Click the chat icon at the bottom right of any page. Typical wait time is under 2 minutes."},
+    {q:"How do I raise a support ticket?",a:"Go to My Account > Help Center > New Ticket, describe your issue, and attach any relevant screenshots. Tickets are assigned to an agent within 1 hour and resolved within 24 hours."},
+  ]},
+};
+
+const faqs=[
+  // ORDER PLACING
+  {p:["how to order","place an order","how do i order","how to buy","how to purchase","steps to order","ordering process","how to place","want to order","how can i order","how to shop","how do i buy","how do i place","order details","give order","ordering"],i:"how_to_order",r:"Placing an order is easy! 1) Search for the product. 2) Click Add to Cart or Buy Now. 3) Select size or quantity if needed. 4) Go to cart and click Checkout. 5) Enter your delivery address. 6) Choose a payment method and confirm. You will instantly receive a confirmation SMS and email."},
+  // ORDER TRACKING
+  {p:["track","where is my order","order status","where my order","check my order","order update","package","shipment","not delivered yet","delivery status","when will i get","order reached","order details"],i:"order_tracking",r:"To track your order, go to My Orders in your account and enter your Order ID. You will see real-time status updates. You also receive SMS notifications at every delivery stage. Standard delivery takes 3-5 business days."},
+  // CANCEL ORDER
+  {p:["cancel","cancellation","cancel my order","how to cancel","i want to cancel","stop my order"],i:"order_cancel",r:"Orders can be cancelled within 2 hours of placing them. Go to My Orders, select your order, and tap Cancel. After 2 hours the order moves to dispatch and cannot be cancelled — you may return it after delivery."},
+  // WRONG / MISSING ITEM
+  {p:["wrong item","wrong product","received wrong","got wrong","missing item","item missing","not received","order missing","incomplete order"],i:"wrong_item",r:"We are sorry about this! Go to My Orders > Report Issue > Wrong Item and upload a photo. We will arrange a free pickup and send the correct item within 3 business days."},
+  // CHANGE ADDRESS
+  {p:["change address","update address","wrong address","edit address","change delivery","delivery address","modify address"],i:"address_change",r:"You can update your delivery address within 1 hour of placing the order via My Orders > Edit Address. After that the order is locked for dispatch and changes are not possible."},
+  // REFUND
+  {p:["refund","return","money back","exchange","get my money","how to return","want refund","refund process","how to get refund","give me refund","return product","send back"],i:"refund_request",r:"To request a refund, go to My Orders, select the item, and tap Request Return. Returns are accepted within 30 days of delivery. Refunds are processed in 5-7 business days to your original payment method."},
+  // REFUND STATUS
+  {p:["refund status","where is my refund","refund not received","refund not credited","when will i get refund","refund pending","refund update"],i:"refund_status",r:"UPI refunds take 1-3 days and card refunds take 5-7 business days. If it has been longer, please share your order ID and we will escalate it immediately."},
+  // SHIPPING
+  {p:["shipping","delivery time","when will","arrive","how long","shipping charge","delivery charge","shipping cost","how many days","delivery days","free shipping","express delivery","same day"],i:"shipping_info",r:"Standard shipping is free on orders above Rs.500 and takes 3-5 business days. Express delivery (1-2 days) costs Rs.150. Same-day delivery is Rs.250 in select cities. A tracking link is shared once dispatched."},
+  // PASSWORD
+  {p:["password","forgot password","reset password","cannot login","login issue","sign in problem","forgot my password","change password","unable to login","not able to login"],i:"password_reset",r:"Click Forgot Password on the login page and enter your registered email. A reset link will arrive within 2 minutes. Check your spam folder if you do not see it. The link is valid for 30 minutes."},
+  // ACCOUNT
+  {p:["account","create account","delete account","my account","account issue","update profile","change mobile","update mobile","change email","profile update"],i:"account",r:"For account-related help, go to My Account in the app or website. You can update your mobile number, email, and profile details there. For deleting your account, go to My Account > Settings > Delete Account."},
+  // PAYMENT FAILED
+  {p:["payment failed","payment not done","transaction failed","payment issue","deducted","amount deducted","money deducted","charged twice","double charge","payment problem","payment error","not paid"],i:"payment_issue",r:"Please do not worry. If payment failed but the amount was debited, it will automatically reverse within 5-7 business days. If not reversed after 7 days, share your transaction ID and we will escalate it immediately."},
+  // PAYMENT METHODS
+  {p:["payment method","how to pay","payment options","upi","gpay","phonepe","paytm","credit card","debit card","net banking","cod","cash on delivery","wallet","accepted payment"],i:"payment_methods",r:"We accept all major credit and debit cards, UPI (GPay, PhonePe, Paytm), net banking (50+ banks), EMI, and our in-app wallet. Cash on delivery is available on orders below Rs.2000."},
+  // EMI
+  {p:["emi","instalment","monthly payment","pay monthly","no cost emi","easy emi"],i:"emi",r:"EMI is available on orders above Rs.1000 using HDFC, ICICI, SBI, Axis, or Kotak credit cards. Choose 3, 6, or 12-month plans at checkout. No-cost EMI is available on select products."},
+  // PROMO CODE
+  {p:["promo","coupon","discount code","offer code","apply code","voucher","promo code not working","code invalid"],i:"promo",r:"Enter your promo code in the Discount Code field at checkout. Only one code per order. Make sure the code has not expired and the minimum order value is met. Current offers: SAVE10, FIRSTBUY, WEEKEND20."},
+  // OFFERS
+  {p:["offer","discount","sale","deal","cashback","best price","today offer","current offer","active offer"],i:"offers",r:"Current offers: SAVE10 (10% off above Rs.300), FIRSTBUY (15% off first order), WEEKEND20 (20% off weekends), REFER50 (Rs.50 cashback on referral). Enter code at checkout."},
+  // DAMAGED PRODUCT
+  {p:["damaged","broken","defective","not working","poor quality","product damaged","received broken","product issue","quality issue"],i:"product_issue",r:"We are sorry about this. Please report within 48 hours via My Orders > Report Issue and upload clear photos of the damage. We will arrange a free pickup and send a replacement or full refund within 3 business days."},
+  // WARRANTY
+  {p:["warranty","guarantee","warranty claim","product warranty","how long warranty","warranty period"],i:"warranty",r:"Most electronics carry a 1-year manufacturer warranty. Your invoice serves as the warranty card. Extended warranty plans are available at checkout for select products."},
+  // EXCHANGE / SIZE
+  {p:["exchange","size exchange","wrong size","different size","size issue","want to exchange","change size"],i:"exchange",r:"You can exchange for a different size within 15 days of delivery via My Orders > Request Exchange. The first exchange per order is completely free."},
+  // INVOICE
+  {p:["invoice","bill","receipt","gst","download invoice","tax invoice","billing"],i:"invoice",r:"Your invoice is emailed after order confirmation. You can also download it from My Orders > Download Invoice. GST invoices are available for business accounts."},
+  // APP ISSUE
+  {p:["app","crashing","not loading","app slow","app not working","app error","app crash","app problem","app not opening","black screen"],i:"app_issue",r:"Please force close the app, clear its cache from phone settings, check your internet, and update to the latest version. If the issue continues, uninstall and reinstall the app."},
+  // WEBSITE ISSUE
+  {p:["website","site not working","website not loading","website error","page not loading","website down","website issue"],i:"website_issue",r:"Clear your browser cache (Ctrl+Shift+Delete), try a different browser, or disable extensions. You can check our status at status.company.com for any ongoing issues."},
+  // OTP
+  {p:["otp","not receiving otp","otp not coming","verification code","otp problem","otp issue","resend otp","otp not received"],i:"otp_issue",r:"Check your network signal and make sure DND is not enabled on your phone. Wait 60 seconds and request the OTP again. You can also use email OTP as a backup."},
+  // NOTIFICATIONS
+  {p:["notification","not getting notification","no notification","push notification","alert","notification not working"],i:"notification",r:"Enable notifications under phone Settings > Apps > Our App > Notifications. Make sure battery saver is not blocking background activity. Try logging out and back in."},
+  // CONTACT / AGENT
+  {p:["contact","agent","human","speak to","talk to","call support","email support","live chat","raise ticket","support team","customer care","help me","need help"],i:"escalation",r:"You can reach us by phone at 1800-XXX-XXXX (Mon-Sat, 9AM-6PM), by email at support@company.com (4-hour response), or via live chat on our website from 9AM to 10PM daily."},
+  // REFERRAL
+  {p:["refer","referral","refer a friend","referral code","refer and earn","refer program"],i:"referral",r:"Find your referral code under My Account > Refer and Earn. When a friend places their first order using your code, both of you get Rs.50 cashback. There is no limit on referrals."},
+  // REWARDS
+  {p:["reward","points","loyalty","loyalty points","reward points","my points","redeem points"],i:"rewards",r:"Earn 1 reward point for every Rs.10 spent. Every 100 points = Rs.10 off your next order. Points expire after 12 months. Check your balance under My Account > Rewards."},
+  // SHOP NAME
+  {p:["shop name","store name","what is your name","your name","company name","who are you","what shop","which shop","what store","which store","about you","about your shop","about your store","what company","your brand","brand name","shop details","store details","company details","enanu keten","enna shop","what is this shop","this company","this store","tell me about","name of shop","name of store"],i:"shop_info",r:"We are ShopMart India — your trusted one-stop online shopping destination! 🛍️\n\nWe offer a wide range of products including electronics, fashion, home essentials, and more — all 100% genuine and sourced from authorized distributors.\n\nFor any help, feel free to ask or browse the topic tabs above!"},
+  // ADDRESS
+  {p:["address","location","where are you","your address","office address","store address","shop address","warehouse","head office","where is your shop","where is your store","headquarters","office location","visit you","come to your shop","find you","directions"],i:"address_info",r:"📍 ShopMart India — Head Office:\n\nNo. 42, Anna Salai, 3rd Floor,\nTeynampet, Chennai – 600018,\nTamil Nadu, India.\n\n📞 Phone: 1800-123-4567 (Toll-Free, Mon–Sat, 9AM–6PM)\n📧 Email: support@shopmart.in\n🌐 Website: www.shopmart.in\n\nWe are an online store — no walk-in purchases. For support, contact us via phone, email, or live chat!"},
+  // GREETING
+  {p:["hello","hi","hey","good morning","good evening","good afternoon","howdy","hii","helo"],i:"greeting",r:"Hello! How can I help you today?"},
+  // CLOSING
+  {p:["thank","thanks","thank you","okay","ok","great","perfect","awesome","bye","goodbye","done","got it","understood"],i:"closing",r:"You are welcome! Is there anything else I can help you with? Have a great day!"},
+];
+
+function getTime(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+
+function classify(text){
+  const l=text.toLowerCase();
+  let best=null,score=0;
+  for(const f of faqs){const s=f.p.filter(p=>l.includes(p)).length;if(s>score){score=s;best=f;}}
+  if(best) return best.r;
+  return "I'm not sure I understood that. Here are some things I can help you with:\n\n• 📦 Track or cancel your order\n• 💰 Refunds and returns\n• 🚚 Shipping details\n• 🔑 Account & password help\n• 💳 Payment issues\n\nTry typing something like 'track my order' or tap a topic tab above.";
+}
+
+function addMsg(text,type){
+  const body=document.getElementById('chatBody');
+  const wrap=document.createElement('div');
+  wrap.className='msg '+type;
+  const av=document.createElement('div');
+  av.className='mav '+(type==='bot'?'bav':'uav');
+  av.innerHTML=type==='bot'?'&#129302;':'U';
+  const inner=document.createElement('div');
+  const bbl=document.createElement('div');
+  bbl.className='bbl';
+  if(type==='bot'){bbl.innerHTML=text.replace(/\n/g,'<br>');}else{bbl.textContent=text;}
+  const t=document.createElement('div');
+  t.className='time';t.textContent=getTime();
+  inner.appendChild(bbl);inner.appendChild(t);
+  wrap.appendChild(av);wrap.appendChild(inner);
+  body.appendChild(wrap);
+  body.scrollTop=body.scrollHeight;
+}
+
+function showTyping(){
+  const body=document.getElementById('chatBody');
+  const d=document.createElement('div');
+  d.className='typing-wrap';d.id='typing';
+  d.innerHTML='<div class="mav bav">&#129302;</div><div class="typing-bbl"><span></span><span></span><span></span></div>';
+  body.appendChild(d);body.scrollTop=body.scrollHeight;
+}
+
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+function sendMsg(){
+  const inp=document.getElementById('userInput');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';
+  const chips=document.getElementById('chips');
+  if(chips)chips.style.display='none';
+  addMsg(text,'user');
+  showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    const res=classify(text);
+    addMsg(res,'bot');
+  },800+Math.random()*500);
+}
+
+function sendChip(el){
+  document.getElementById('userInput').value=el.textContent;
+  sendMsg();
+}
+
+function switchTab(key,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const cv=document.getElementById('chatView');
+  const sv=document.getElementById('sectionView');
+  if(key==='chat'){cv.style.display='flex';sv.style.display='none';return;}
+  cv.style.display='none';sv.style.display='flex';
+  const sec=sections[key];
+  sv.innerHTML='<div class="sec-panel">'+
+    sec.items.map(item=>`<div class="sec-card" onclick="askFromSection('${item.q.replace(/'/g,"\\'")}')">
+      <div class="sec-icon">${sec.icon}</div>
+      <div style="flex:1"><div class="sec-q">${item.q}</div><div class="sec-hint">Tap for an instant answer</div></div>
+      <div class="arr">&#8250;</div>
+    </div>`).join('')+
+  '</div>';
+}
+
+function askFromSection(q){
+  switchTab('chat',document.querySelector('.tab'));
+  document.getElementById('userInput').value=q;
+  sendMsg();
+}
+</script>
